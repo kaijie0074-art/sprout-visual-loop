@@ -1,0 +1,12 @@
+{
+  "transcript": [
+    {"turn": 1, "text": "首页要一个大 banner"},
+    {"turn": 2, "text": "个只 logo 摆左边咯 睇下 做个好似抖音咁样嘅 稳阵"},
+    {"turn": 3, "text": "加个社区模块"}
+  ],
+  "images": [
+    {"key": "competitor_01", "scenario": "screenshot_clear", "style": "screenshot"},
+    {"key": "draft_01", "scenario": "handdrawn", "style": "handdrawn"},
+    {"key": "shot_02", "scenario": "hallucinated", "style": "screenshot"}
+  ]
+}
