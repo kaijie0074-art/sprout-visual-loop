@@ -1,19 +1,92 @@
-# sprout-visual-loop（缺陷基线 v0.1.0）
+# sprout-visual-loop
 
-> ⚠️ **缺陷基线快照**：VLM/ASR 输出直接当需求文档用的直通管线，用于复现问题报告的输入侧 6 类难点与输出侧 5 类缺失。
+> **视觉反馈闭环**（问题②+④）：输入侧"多模态脏输入 → 无幻觉结构化需求"；输出侧"提案式修改 + 自动验收断言"。
+>
+> 客户用视觉方式表达需求（截图/方言语音/手绘稿），也用视觉方式验收结果（"logo 大一点""高级点的蓝"）——同一个闭环的两端。
 
-## 现状
+![CI](https://github.com/kaijie0074-art/sprout-visual-loop/actions/workflows/ci.yml/badge.svg)
 
-- 无假设清单：幻觉补全（客户没提的登录页）直接混进需求树（暗幻觉）；
-- 无置信路由：手绘稿低置信判定照样直接采用；
-- 无归一/无共指：粤语转写、『那个』指代一律不解；
-- 参考图 = 全量仿制；修改后不验证；模糊指令单点拍板；无往返计数。
+## 对应岗位难题
 
-## 复现
+末龙科技 AI 应用工程师岗·三大技术难题之**问题②+④**。输入侧的命门是**幻觉补全**（客户没提的，模型按"常见 APP 该有的样子"悄悄加上）；输出侧的天花板是**主观验收无法形式化**——正确目标不是消灭人工确认，而是压缩确认的往返次数与单次成本。
 
-```bash
-python3 -m unittest discover -s tests
-# Ran 18 tests ... FAILED (failures=13, errors=2)
+## 架构
+
+```mermaid
+flowchart LR
+    subgraph 输入侧["输入侧（问题②）"]
+        A[微信截图/方言语音/手绘稿] --> B[Mock VLM/ASR]
+        B --> C[归一：粤语词表]
+        C --> D[意图树构建<br/>只有明说证据进树]
+        D --> E[假设清单 assumptions<br/>幻觉/低置信/指代未闭合 全部显式化]
+        F[共指实体表] --> D
+        E -->|人工逐条确认| D
+        G["『像抖音那样』"] --> H[模板对齐+差异清单<br/>禁止全量仿制]
+    end
+    subgraph 输出侧["输出侧（问题④）"]
+        I[模糊指令<br/>大一点/高级的蓝] --> J[提案式修改<br/>3 尺寸候选 / 6 色卡]
+        J --> K[确定性渲染 PPM 预览]
+        L[patch 应用] --> M[属性断言<br/>说改了=真改了]
+        K --> N[像素 diff<br/>变化区域定位]
+        M --> O[客户点选确认]
+        N --> O
+        O -->|超 2 轮未确认| P[升级转人工]
+    end
+    D --> L
 ```
 
-失败清单与难点对位见主仓库 `docs/02-复现材料.md`；修复版见 [sprout-visual-loop](../sprout-visual-loop)（v1.0.0，18/18 通过）。
+## 快速开始
+
+```bash
+# 输入侧：脏输入 → 意图树 + 假设清单（幻觉被捕获进 assumptions，暗幻觉=0）
+python3 -m visual_loop.cli intake --inputs examples/inputs.json
+
+# 参考表达 → 模板 + 差异清单（不做全量仿制）
+python3 -m visual_loop.cli align --ref "做个像抖音那样的"
+
+# 输出侧：模糊指令 → 多候选 + 预览截图
+python3 -m visual_loop.cli propose --config examples/site.json --kind resize --target logo --out-dir previews
+python3 -m visual_loop.cli propose --config examples/site.json --kind color --target banner --out-dir previews
+
+# 属性断言 + 像素 diff（"说改了但没改"必被抓住）
+python3 -m visual_loop.cli verify --declared examples/declared.json --before examples/site.json --after examples/site2.json
+python3 -m visual_loop.cli diff --before examples/site.json --after examples/site2.json
+```
+
+## 验证
+
+```bash
+python3 -m unittest discover -s tests -v   # 18 项全绿
+```
+
+同一套测试在缺陷基线上 **15 项失败**（docs/06）：暗幻觉混入需求树、手绘稿直接采用、指代悬空、修改不验证、单点拍板、审美死胡同无限打转。
+
+## 目录结构
+
+```
+visual_loop/
+  intent_tree.py    # 意图树：明说证据才进树（source+confidence）
+  assumptions.py    # 假设清单机制（反幻觉核心）+ 暗幻觉计数
+  coref.py          # 共指实体表：『那个』的指代链
+  normalize.py      # 粤语/转写噪音归一
+  align.py          # 参考图对齐：最近模板 + 差异清单
+  mock_vlm.py       # 确定性 Mock VLM（含幻觉/低置信/手绘场景）
+  mock_asr.py       # 确定性 Mock ASR（粤语转写噪音）
+  proposals.py      # 提案式修改：3 尺寸候选 / 6 色卡 + 预览
+  render.py         # 确定性渲染器：配置 → PPM 截图
+  pixel_diff.py     # 像素 diff：变化率 + 区域 bbox
+  assertions.py     # 属性断言：声明的改动逐条机检
+  rounds.py         # 往返计数：超 2 轮未确认升级转人工
+  api.py / cli.py
+tests/              # 18 项回归（输入侧 12 + 输出侧 6）
+examples/           # CLI 演示样例
+docs/
+```
+
+## 工程过程
+
+问题报告见 [Issue #1](https://github.com/kaijie0074-art/sprout-visual-loop/issues/1)，修复走 [PR #2](https://github.com/kaijie0074-art/sprout-visual-loop/pull/2)（评审/采纳/验收），发布见 [Releases](https://github.com/kaijie0074-art/sprout-visual-loop/releases)。
+
+## 声明
+
+**模拟项目**：为末龙科技 AI 应用工程师岗三大技术难题的工程化模拟（2026-10）。VLM/ASR 为确定性 Mock（验证闭环工程而非模型能力）；图像为代码生成的 PPM 文本位图（零依赖的截图管线最小实现）；技术路线源自公开调研与业务链路推演。

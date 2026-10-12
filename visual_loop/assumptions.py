@@ -8,7 +8,14 @@ import copy
 
 
 def confirm_assumption(report: dict, assumption_id: str, accept: bool = True) -> dict:
-    """确认/驳回一条假设，返回更新后的 report（不改入参）。"""
+    """确认/驳回一条假设，返回更新后的 report（不改入参）。
+
+    R3-1（评审修复）：未知 assumption_id 抛 ValueError——确认流程的关键
+    路径上，静默无操作等于让"客户以为确认了"可以无声失败。
+    """
+    known = {asm["id"] for asm in report["assumptions"]}
+    if assumption_id not in known:
+        raise ValueError(f"假设 {assumption_id!r} 不存在（当前假设：{sorted(known)}）")
     updated = copy.deepcopy(report)
     remaining = []
     for asm in updated["assumptions"]:

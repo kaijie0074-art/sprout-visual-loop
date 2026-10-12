@@ -1,0 +1,12 @@
+{
+  "siteName": "演示站",
+  "pages": [
+    {
+      "pageId": "home",
+      "components": [
+        {"type": "logo", "props": {"x": 40, "y": 8, "w": 16, "h": 16}},
+        {"type": "banner", "props": {}}
+      ]
+    }
+  ]
+}
