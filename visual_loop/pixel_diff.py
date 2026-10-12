@@ -8,6 +8,10 @@ from .render import render_page
 
 
 def diff(img_a: list, img_b: list, threshold: int = 30) -> dict:
+    # R3-2（评审修复）：尺寸不等显式报错——裸 IndexError 不可诊断
+    if (len(img_a), len(img_a[0])) != (len(img_b), len(img_b[0])):
+        raise ValueError(f"两图尺寸不等：{len(img_a[0])}x{len(img_a)} vs "
+                         f"{len(img_b[0])}x{len(img_b)}（diff 前必须同源渲染）")
     h, w = len(img_a), len(img_a[0])
     changed, max_delta = [], 0
     for y in range(h):
