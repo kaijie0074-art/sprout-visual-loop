@@ -6,6 +6,7 @@ import unittest
 
 from visual_loop.api import (align_reference, build_intent_tree,
                              confirm_assumption, dark_hallucination_count)
+from providers import ScenarioMapVlm
 from visual_loop.normalize import normalize
 
 T_LOGO = [{"turn": 1, "text": "个只 logo 摆左边咯 睇下 做个好似抖音咁样嘅 稳阵"}]
@@ -29,7 +30,7 @@ class TestNormalize(unittest.TestCase):
 class TestAntiHallucination(unittest.TestCase):
     def test_hallucinated_component_captured(self):
         """客户没提登录页：VLM 自信补全 → 必须进 assumptions，绝不进树。"""
-        report = build_intent_tree({"images": [{"key": "shot", "scenario": "hallucinated"}]})
+        report = build_intent_tree({"images": [{"key": "shot", "scenario": "hallucinated"}]}, vlm=ScenarioMapVlm())
         self.assertIn("login_screen", [a["guess"] for a in report["assumptions"]],
                       "幻觉项必须被假设清单捕获")
         self.assertNotIn("login_screen", _names(report), "幻觉项不得混入需求树")
@@ -40,17 +41,17 @@ class TestAntiHallucination(unittest.TestCase):
                   "images": [{"key": "s1", "scenario": "screenshot_clear"},
                              {"key": "s2", "scenario": "hallucinated"},
                              {"key": "s3", "scenario": "screenshot_uncertain"}]}
-        report = build_intent_tree(inputs)
+        report = build_intent_tree(inputs, vlm=ScenarioMapVlm())
         self.assertEqual(dark_hallucination_count(report), 0)
 
     def test_low_confidence_to_assumptions(self):
         """组件类型判定不稳（0.55）：进 assumptions 强制人工确认。"""
-        report = build_intent_tree({"images": [{"key": "s", "scenario": "screenshot_uncertain"}]})
+        report = build_intent_tree({"images": [{"key": "s", "scenario": "screenshot_uncertain"}]}, vlm=ScenarioMapVlm())
         self.assertIn("feed_cards", [a["guess"] for a in report["assumptions"]])
         self.assertNotIn("feed_cards", _names(report))
 
     def test_confirm_moves_node_into_tree(self):
-        report = build_intent_tree({"images": [{"key": "s", "scenario": "hallucinated"}]})
+        report = build_intent_tree({"images": [{"key": "s", "scenario": "hallucinated"}]}, vlm=ScenarioMapVlm())
         asm_id = report["assumptions"][0]["id"]
         updated = confirm_assumption(report, asm_id, accept=True)
         self.assertEqual(updated["assumptions"], [])
@@ -65,7 +66,7 @@ class TestAntiHallucination(unittest.TestCase):
 
 class TestConfidenceRouting(unittest.TestCase):
     def test_handdrawn_routes_to_human_review(self):
-        report = build_intent_tree({"images": [{"key": "draft", "scenario": "handdrawn"}]})
+        report = build_intent_tree({"images": [{"key": "draft", "scenario": "handdrawn"}]}, vlm=ScenarioMapVlm())
         self.assertTrue(report["requires_human_review"], "手绘稿必须强制人工确认页")
 
 

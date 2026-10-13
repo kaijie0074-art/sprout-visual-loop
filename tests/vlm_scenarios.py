@@ -1,9 +1,7 @@
-"""确定性 Mock VLM：按场景脚本化输出对 截图/手绘稿 的结构描述。
+"""VLM 输出场景语料（测试夹具，仅 tests/ 内使用；产品代码不含脚本化模型）。
 
-关键设计：每个组件带 `present`（图中是否真有）与 `confidence`。
-  - present=False 的项无论置信度多高，都是幻觉补全——必须进 assumptions；
-  - present=True 但 confidence 低（手绘稿/组件类型拿不准）→ 进 assumptions
-    强制人工确认（分层置信路由，源文档 3.1 路线 4）。
+经 tests.providers.ScriptedVlm 注入 build_intent_tree，回归分层置信路由与
+反幻觉行为（清晰截图 / 组件类型拿不准 / 手绘稿 / 幻觉补全，对应源文档 3.1 难点）。
 """
 SCENARIOS = {
     # 清晰竞品截图：布局拓扑 + 组件类型都拿得准
@@ -42,13 +40,3 @@ SCENARIOS = {
         ],
     },
 }
-
-
-def describe(image_key: str, scenario: str = "screenshot_clear") -> dict:
-    out = {"image_key": image_key, "scenario": scenario}
-    out.update(SCENARIOS[scenario])
-    return out
-
-
-def supported_scenarios() -> list:
-    return sorted(SCENARIOS)

@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .api import (align_reference, build_intent_tree, diff_configs, propose,
                   verify_change)
-
+from .vlm import VlmConfigError
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="visual_loop", description="视觉反馈闭环")
@@ -43,7 +43,11 @@ def main(argv=None):
 
     if args.cmd == "intake":
         inputs = json.loads(Path(args.inputs).read_text(encoding="utf-8"))
-        out = build_intent_tree(inputs)
+        try:
+            out = build_intent_tree(inputs)
+        except VlmConfigError as e:
+            print(f"错误：{e}", file=sys.stderr)
+            sys.exit(2)
     elif args.cmd == "propose":
         config = json.loads(Path(args.config).read_text(encoding="utf-8"))
         instruction = {"kind": args.kind, "target": args.target}

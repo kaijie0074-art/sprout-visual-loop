@@ -6,8 +6,8 @@
   - "像 X 那样"不进树——标记为参考提示，走模板对齐（align），不做全量仿制。
 """
 from .coref import EntityTable, is_reference_token
-from .mock_vlm import describe
 from .normalize import normalize
+from .vlm import VlmClient
 
 CONF_THRESHOLD = 0.85   # 组件类型判定置信阈值
 
@@ -21,8 +21,14 @@ POS_MAP = {"放左边": "left", "放右边": "right", "放上面": "top",
            "放下面": "bottom", "放这里": "here", "放大": "bigger"}
 
 
-def build_intent_tree(inputs: dict) -> dict:
-    """inputs = {transcript: [{turn, text}], images: [{key, scenario}]} → IntentReport。"""
+def build_intent_tree(inputs: dict, vlm=None) -> dict:
+    """inputs = {transcript: [{turn, text}], images: [{key, path}]} → IntentReport。
+
+    vlm 缺省时构造真实 VLM 客户端（OpenAI 兼容多模态，需环境变量凭证）。
+    """
+    # 惰性解析：纯 transcript 输入不触达 VLM，无需凭证即可运行
+    if vlm is None and inputs.get("images"):
+        vlm = VlmClient()
     home = {"pageId": "home", "components": [], "modifications": []}
     assumptions, unresolved, ref_hints = [], [], []
     entities = EntityTable()
@@ -67,7 +73,7 @@ def build_intent_tree(inputs: dict) -> dict:
     # ---------- 图片：分层置信路由 ----------
     review = False
     for img in inputs.get("images", []):
-        d = describe(img["key"], img.get("scenario", "screenshot_clear"))
+        d = vlm.describe(img.get("path", img["key"]), img.get("scenario", ""))
         if d["requires_human_review"]:
             review = True   # 手绘稿：强制人工确认页（难点 2）
         for c in d["components"]:

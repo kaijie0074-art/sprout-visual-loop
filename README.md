@@ -15,7 +15,7 @@
 ```mermaid
 flowchart LR
     subgraph 输入侧["输入侧（问题②）"]
-        A[微信截图/方言语音/手绘稿] --> B[Mock VLM/ASR]
+        A[微信截图/方言语音/手绘稿] --> B[真实 VLM/ASR<br/>OpenAI 兼容协议]
         B --> C[归一：粤语词表]
         C --> D[意图树构建<br/>只有明说证据进树]
         D --> E[假设清单 assumptions<br/>幻觉/低置信/指代未闭合 全部显式化]
@@ -70,8 +70,8 @@ visual_loop/
   coref.py          # 共指实体表：『那个』的指代链
   normalize.py      # 粤语/转写噪音归一
   align.py          # 参考图对齐：最近模板 + 差异清单
-  mock_vlm.py       # 确定性 Mock VLM（含幻觉/低置信/手绘场景）
-  mock_asr.py       # 确定性 Mock ASR（粤语转写噪音）
+  vlm.py           # 真实 VLM 客户端（OpenAI 兼容多模态，环境变量凭证）
+  asr.py           # 真实 ASR 客户端（OpenAI 兼容 /audio/transcriptions）
   proposals.py      # 提案式修改：3 尺寸候选 / 6 色卡 + 预览
   render.py         # 确定性渲染器：配置 → PPM 截图
   pixel_diff.py     # 像素 diff：变化率 + 区域 bbox
@@ -89,4 +89,4 @@ docs/
 
 ## 声明
 
-**模拟项目**：为末龙科技 AI 应用工程师岗三大技术难题的工程化模拟（2026-10）。VLM/ASR 为确定性 Mock（验证闭环工程而非模型能力）；图像为代码生成的 PPM 文本位图（零依赖的截图管线最小实现）；技术路线源自公开调研与业务链路推演。
+**说明**：针对末龙科技 AI 应用工程师岗三大技术难题之问题②的工程化实现（2026-10）。VLM/ASR 为真实 API（OpenAI 兼容协议，默认智谱，可切换任意兼容服务）；图像为代码生成的 PPM 文本位图（零依赖的截图管线最小实现）；技术路线源自公开调研与业务链路推演。

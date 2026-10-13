@@ -1,6 +1,8 @@
 """评审轮修复验证（PR #2 评审意见 R3-1/R3-2 的回归测试）。"""
 import unittest
 
+from providers import ScenarioMapVlm
+
 from visual_loop.api import build_intent_tree, confirm_assumption
 from visual_loop.images import blank
 from visual_loop.pixel_diff import diff
@@ -10,7 +12,7 @@ class TestReviewFixes(unittest.TestCase):
     def test_r3_1_unknown_assumption_id_raises(self):
         """R3-1：未知 assumption_id 必须显式报错，不得静默无操作。"""
         report = build_intent_tree(
-            {"images": [{"key": "s", "scenario": "hallucinated"}]})
+            {"images": [{"key": "s", "scenario": "hallucinated"}]}, vlm=ScenarioMapVlm())
         with self.assertRaises(ValueError):
             confirm_assumption(report, "ASM-999", accept=True)
         # 报告本身不被破坏，正确 id 仍可确认
