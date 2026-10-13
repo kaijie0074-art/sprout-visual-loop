@@ -2,6 +2,18 @@
 
 遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased] - 2026-10-14
+
+自主深潜研究（docs/research/deep-dive-20261014.md，61 次真实 VLM 调用）驱动的两项修复：
+
+### 修复
+- **容错 JSON 解析** `vlm.py::parse_model_json`：实测 glm-4v-flash 在深嵌套页面 6/40 次输出畸形 JSON（`{ {` 双开括号 + 配对尾括号、截断），原实现 `json.loads` 直接抛异常中断 intake——现逐级修复（code fence/双括号/补尾括号），5/5 真实故障输出回放通过。
+- **自一致置信** `vlm.py::describe_stable` + `intent_tree.build_intent_tree(stable_k=3)`：实测自报 confidence 坍缩为常数 1.0（校准失效）且同图 5 次采样 3 种组件集合（非确定性），幻觉组件以 present=true+conf=1.0 直通需求树。现在组件 confidence = 跨采样一致率（缺席=反对票），<0.85 自动落回 assumptions——live 验证：歧义密集页全部组件转人工，清晰格式塔页 3/3 直通。
+
+### 新增
+- 回归测试 7 项（共 29）：真实畸形输出回放、经验置信度、幻觉组件端到端路由（`tests/test_research_fixes.py`）。
+- 研究证据链 `evidence/deep-dive-20261014/`：确定性实验位图生成器、串行节流 harness、评分器、原始结果（results.jsonl）与复现命令。
+
 ## [v1.0.0] - 2026-10-13
 
 修复问题报告（Issue #1）输入侧 5 类难点与输出侧验证缺失，18/18 测试通过。

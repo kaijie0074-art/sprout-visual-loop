@@ -56,10 +56,12 @@ python3 -m visual_loop.cli diff --before examples/site.json --after examples/sit
 ## 验证
 
 ```bash
-python3 -m unittest discover -s tests -v   # 18 项全绿
+python3 -m unittest discover -s tests -v   # 29 项全绿
 ```
 
 同一套测试在缺陷基线上 **15 项失败**（docs/06）：暗幻觉混入需求树、手绘稿直接采用、指代悬空、修改不验证、单点拍板、审美死胡同无限打转。
+
+深入自主研究（61 次真实 VLM 调用，模型能力上限实证）：[docs/research/deep-dive-20261014.md](docs/research/deep-dive-20261014.md)——实测小模型自报置信坍缩/采样非确定性/畸形 JSON，及其工程对策。
 
 ## 目录结构
 
@@ -70,7 +72,7 @@ visual_loop/
   coref.py          # 共指实体表：『那个』的指代链
   normalize.py      # 粤语/转写噪音归一
   align.py          # 参考图对齐：最近模板 + 差异清单
-  vlm.py           # 真实 VLM 客户端（OpenAI 兼容多模态，环境变量凭证）
+  vlm.py           # 真实 VLM 客户端（容错 JSON 解析 + describe_stable 自一致置信）
   asr.py           # 真实 ASR 客户端（OpenAI 兼容 /audio/transcriptions）
   proposals.py      # 提案式修改：3 尺寸候选 / 6 色卡 + 预览
   render.py         # 确定性渲染器：配置 → PPM 截图
@@ -78,7 +80,7 @@ visual_loop/
   assertions.py     # 属性断言：声明的改动逐条机检
   rounds.py         # 往返计数：超 2 轮未确认升级转人工
   api.py / cli.py
-tests/              # 18 项回归（输入侧 12 + 输出侧 6）
+tests/              # 29 项回归（输入侧 12 + 输出侧 6 + 研究 7 + live env-gated 4）
 examples/           # CLI 演示样例
 docs/
 ```

@@ -13,11 +13,10 @@
   VISUAL_LOOP_BASE_URL  可选（默认智谱开放平台；可指向任意 OpenAI 兼容服务）
   VISUAL_LOOP_VLM_MODEL 可选（默认 glm-4v-flash）
 """
-from __future__ import annotations
-
 import base64
 import json
 import os
+import re
 import urllib.request
 
 
@@ -36,6 +35,58 @@ PROMPT = (
     "铁律：只描述图中真实存在的内容；不存在就不要编。"
 )
 
+
+def parse_model_json(text: str) -> dict:
+    """解析模型输出的 JSON，容忍真实模型实测缺陷（evidence/deep-dive-20261014）。
+
+    实测故障模式（glm-4v-flash，40 次调用 6 次复现）：
+      1. code fence（原有处理保留）；
+      2. 重复左花括号：```json\\n{\\n    {\\n "page_kind"...（深缩进输出时高发）；
+      3. 截断输出（右括号缺失）。
+    逐级尝试修复，全部失败抛 JSONDecodeError。
+    """
+    if text.startswith("```"):
+        text = text.split("```", 2)[1].removeprefix("json").strip()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        original_err = e  # PEP 3110: as 名字在块尾自动解绑，需转存
+    stripped = text.strip()
+    dedup_open = re.sub(r"^\{\s*(?=\{)", "", stripped) if stripped.startswith("{") else stripped
+    dedup_both = re.sub(r"\}\s*\}$", "}", dedup_open) if dedup_open != stripped else stripped
+    for cand in (dedup_open, dedup_both, _balance_close(stripped), _balance_close(dedup_open)):
+        if cand == stripped:
+            continue
+        try:
+            return json.loads(cand)
+        except json.JSONDecodeError:
+            continue
+    raise original_err
+
+
+def _balance_close(text: str) -> str:
+    """为截断的 JSON 补齐缺失的右括号（只补不删，保守修复）。"""
+    stack = []
+    in_str = False
+    esc = False
+    for ch in text:
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch in "{[":
+            stack.append("}" if ch == "{" else "]")
+        elif ch in "}]" and stack:
+            stack.pop()
+    if in_str:  # 字符串本体被截断：无法安全修复
+        return text
+    return text + "".join(reversed(stack))
 
 class VlmClient:
     def __init__(self, *, api_key: str | None = None, base_url: str | None = None, model: str | None = None):
@@ -80,9 +131,38 @@ class VlmClient:
         with urllib.request.urlopen(req, timeout=60) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
         text = payload["choices"][0]["message"]["content"].strip()
-        if text.startswith("```"):
-            text = text.split("```", 2)[1].removeprefix("json").strip()
-        out = json.loads(text)
+        out = parse_model_json(text)
         out.setdefault("components", [])
         out.setdefault("requires_human_review", False)
         return out
+
+    def describe_stable(self, image_path: str, k: int = 3) -> dict:
+        """同一图采样 k 次，把"自报置信度"替换为"跨采样一致率"（经验置信度）。
+
+        动机（evidence/deep-dive-20261014 Q6/Q7 实测）：glm-4v-flash 自报 confidence
+        退化为常数 1.0（校准失效），且同图 5 次采样出现 3 种不同组件集合（非确定性），
+        "present=true + confidence=1.0" 的幻觉组件会直通需求树。一致率 <1 的组件
+        confidence 被压低，重新落回 intent_tree 的 0.85 置信路由（进 assumptions）。
+        """
+        samples = [self.describe(image_path) for _ in range(k)]
+        names = sorted({c["name"] for d in samples for c in d["components"]})
+        components = []
+        for name in names:
+            ballot = [any(c["name"] == name and c.get("present", True)
+                          for c in d["components"]) for d in samples]  # 未出现=缺席票
+            reported_vals = [float(c.get("confidence", 0))
+                             for d in samples for c in d["components"] if c["name"] == name]
+            rate = sum(ballot) / len(ballot)
+            reported = sum(reported_vals) / len(reported_vals) if reported_vals else 0.0
+            components.append({
+                "name": name, "present": rate >= 0.5, "confidence": round(rate, 3),
+                "self_reported_confidence": round(reported, 3), "n_samples": len(ballot)})
+        components.sort(key=lambda c: (-c["confidence"], c["name"]))
+        page_kinds = [d.get("page_kind") for d in samples]
+        stable_kind = max(set(page_kinds), key=page_kinds.count)
+        return {
+            "page_kind": stable_kind,
+            "page_kind_stable": len(set(page_kinds)) == 1,
+            "requires_human_review": sum(1 for d in samples if d["requires_human_review"]) * 2 > k,
+            "components": components, "n_samples": k,
+        }

@@ -1,0 +1,361 @@
+{
+ "video_feed_clean.png": {
+  "layout": "video_feed",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "video_feed_sketch.png": {
+  "layout": "video_feed",
+  "style": "sketch",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "content_home_clean.png": {
+  "layout": "content_home",
+  "style": "clean",
+  "components": [
+   "logo",
+   "banner",
+   "feed_cards",
+   "mall_entry",
+   "tab_bar"
+  ]
+ },
+ "content_home_sketch.png": {
+  "layout": "content_home",
+  "style": "sketch",
+  "components": [
+   "logo",
+   "banner",
+   "feed_cards",
+   "mall_entry",
+   "tab_bar"
+  ]
+ },
+ "morph_000.png": {
+  "layout": "morph_0.0",
+  "style": "clean",
+  "components": [
+   "feed_cards"
+  ]
+ },
+ "morph_025.png": {
+  "layout": "morph_0.25",
+  "style": "clean",
+  "components": [
+   "feed_cards"
+  ]
+ },
+ "morph_050.png": {
+  "layout": "morph_0.5",
+  "style": "clean",
+  "components": [
+   "list"
+  ]
+ },
+ "morph_075.png": {
+  "layout": "morph_0.75",
+  "style": "clean",
+  "components": [
+   "list"
+  ]
+ },
+ "morph_100.png": {
+  "layout": "morph_1.0",
+  "style": "clean",
+  "components": [
+   "list"
+  ]
+ },
+ "count_05.png": {
+  "layout": "count_5",
+  "style": "clean",
+  "components": [
+   "banner",
+   "fab",
+   "list_item",
+   "search_bar",
+   "tab_bar"
+  ],
+  "instances": [
+   "search_bar",
+   "banner",
+   "list_item",
+   "tab_bar",
+   "fab"
+  ],
+  "n_instances": 5
+ },
+ "count_10.png": {
+  "layout": "count_10",
+  "style": "clean",
+  "components": [
+   "banner",
+   "card",
+   "fab",
+   "icon_button",
+   "list_item",
+   "search_bar",
+   "tab_bar"
+  ],
+  "instances": [
+   "search_bar",
+   "banner",
+   "list_item",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "tab_bar",
+   "fab"
+  ],
+  "n_instances": 10
+ },
+ "count_20.png": {
+  "layout": "count_20",
+  "style": "clean",
+  "components": [
+   "banner",
+   "card",
+   "fab",
+   "icon_button",
+   "list_item",
+   "search_bar",
+   "tab_bar"
+  ],
+  "instances": [
+   "search_bar",
+   "banner",
+   "list_item",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "list_item",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "list_item",
+   "card",
+   "tab_bar",
+   "fab"
+  ],
+  "n_instances": 20
+ },
+ "count_40.png": {
+  "layout": "count_40",
+  "style": "clean",
+  "components": [
+   "banner",
+   "card",
+   "fab",
+   "icon_button",
+   "search_bar",
+   "tab_bar"
+  ],
+  "instances": [
+   "search_bar",
+   "banner",
+   "card",
+   "card",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "card",
+   "card",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "card",
+   "card",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "icon_button",
+   "card",
+   "card",
+   "card",
+   "card",
+   "icon_button",
+   "icon_button",
+   "tab_bar",
+   "fab"
+  ],
+  "n_instances": 40
+ },
+ "nested_d1_none.png": {
+  "layout": "nested_d1_none",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar"
+  ]
+ },
+ "nested_d1_fab.png": {
+  "layout": "nested_d1_fab",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "fab"
+  ]
+ },
+ "nested_d1_modal.png": {
+  "layout": "nested_d1_modal",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "modal"
+  ]
+ },
+ "nested_d2_none.png": {
+  "layout": "nested_d2_none",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar"
+  ]
+ },
+ "nested_d2_fab.png": {
+  "layout": "nested_d2_fab",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "fab"
+  ]
+ },
+ "nested_d2_modal.png": {
+  "layout": "nested_d2_modal",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "modal"
+  ]
+ },
+ "nested_d3_none.png": {
+  "layout": "nested_d3_none",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar"
+  ]
+ },
+ "nested_d3_fab.png": {
+  "layout": "nested_d3_fab",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "fab"
+  ]
+ },
+ "nested_d3_modal.png": {
+  "layout": "nested_d3_modal",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "container",
+   "content_cards",
+   "tab_bar",
+   "modal"
+  ]
+ },
+ "sketch_w016.png": {
+  "layout": "sketch_wobble_1.6",
+  "style": "sketch",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "sketch_w040.png": {
+  "layout": "sketch_wobble_4.0",
+  "style": "sketch",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "sketch_w080.png": {
+  "layout": "sketch_wobble_8.0",
+  "style": "sketch",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "clean_dw240.png": {
+  "layout": "downscale_240",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ },
+ "clean_dw120.png": {
+  "layout": "downscale_120",
+  "style": "clean",
+  "components": [
+   "search_bar",
+   "banner",
+   "video_feed",
+   "tab_bar"
+  ]
+ }
+}

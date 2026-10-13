@@ -21,10 +21,12 @@ POS_MAP = {"放左边": "left", "放右边": "right", "放上面": "top",
            "放下面": "bottom", "放这里": "here", "放大": "bigger"}
 
 
-def build_intent_tree(inputs: dict, vlm=None) -> dict:
+def build_intent_tree(inputs: dict, vlm=None, stable_k: int = 1) -> dict:
     """inputs = {transcript: [{turn, text}], images: [{key, path}]} → IntentReport。
 
     vlm 缺省时构造真实 VLM 客户端（OpenAI 兼容多模态，需环境变量凭证）。
+    stable_k >= 3 时启用 describe_stable：组件 confidence = 跨采样一致率，
+    非确定性的幻觉组件（实测同图 5 采样 3 种结果）自动落回 assumptions。
     """
     # 惰性解析：纯 transcript 输入不触达 VLM，无需凭证即可运行
     if vlm is None and inputs.get("images"):
@@ -73,7 +75,8 @@ def build_intent_tree(inputs: dict, vlm=None) -> dict:
     # ---------- 图片：分层置信路由 ----------
     review = False
     for img in inputs.get("images", []):
-        d = vlm.describe(img.get("path", img["key"]), img.get("scenario", ""))
+        d = (vlm.describe_stable(img.get("path", img["key"]), k=stable_k)
+             if stable_k >= 3 else vlm.describe(img.get("path", img["key"]), img.get("scenario", "")))
         if d["requires_human_review"]:
             review = True   # 手绘稿：强制人工确认页（难点 2）
         for c in d["components"]:

@@ -1,0 +1,27 @@
+[
+ {
+  "image": "count_20.png",
+  "model": "glm-4v-flash",
+  "raw": "```json\n{\n    {\n        \"page_kind\": \"unknown\",\n        \"requires_human_review\": false,\n        \"components\": [\n            {\n                \"name\": \"banner\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"login_screen\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"search\",\n                \"present\": false,\n                \"confidence\": 0.5\n            },\n            {\n                \"name\": \"tab_bar\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"feed_cards\",\n                \"present\": true,\n                \"confidence\": 1\n            }\n        ]\n    }\n}\n```"
+ },
+ {
+  "image": "nested_d2_none.png",
+  "model": "glm-4v-flash",
+  "raw": "```json\n{\n    {\n        \"page_kind\": \"unknown\",\n        \"requires_human_review\": false,\n        \"components\": [\n            {\n                \"name\": \"banner\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"feed_cards\",\n                \"present\": true,\n                \"confidence\": 1\n            }\n        ]\n    }\n}\n```"
+ },
+ {
+  "image": "nested_d3_none.png",
+  "model": "glm-4v-flash",
+  "raw": "```json\n{\n    {\n        \"page_kind\": \"unknown\",\n        \"requires_human_review\": false,\n        \"components\": [\n            {\n                \"name\": \"banner\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"tab_bar\",\n                \"present\": true,\n                \"confidence\": 1\n            }\n        ]\n    }\n}\n```"
+ },
+ {
+  "image": "nested_d2_modal.png",
+  "model": "glm-4v-flash",
+  "raw": "```json\n{\n    {\n        \"page_kind\": \"unknown\",\n        \"requires_human_review\": false,\n        \"components\": [\n            {\n                \"name\": \"tab_bar\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"search\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"feed_cards\",\n                \"present\": true,\n                \"confidence\": 1\n            }\n        ]\n    }\n}\n```"
+ },
+ {
+  "image": "nested_d3_modal.png",
+  "model": "glm-4v-flash",
+  "raw": "```json\n{\n    {\n        \"page_kind\": \"unknown\",\n        \"requires_human_review\": false,\n        \"components\": [\n            {\n                \"name\": \"tab_bar\",\n                \"present\": true,\n                \"confidence\": 1\n            },\n            {\n                \"name\": \"feed_cards\",\n                \"present\": true,\n                \"confidence\": 1\n            }\n        ]\n    }\n}\n```"
+ }
+]
